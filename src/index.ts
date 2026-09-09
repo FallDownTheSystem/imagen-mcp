@@ -97,14 +97,17 @@ server.registerTool(
 			"Generate one or more images from a text prompt with OpenAI GPT Image 2.5 (flare or sunburst). Saves files to disk and returns their paths.",
 		inputSchema: z.object({
 			...commonInput,
-			moderation: z.enum(["auto", "low"]).optional().describe("Content moderation strictness. Default auto."),
+			moderation: z
+				.enum(["auto", "low"])
+				.optional()
+				.describe("Content moderation strictness. low = less restrictive filtering. Default low."),
 		}),
 		outputSchema,
 		annotations,
 	},
 	async (input) => {
 		const params = apiParams(input);
-		const result = await client.images.generate({ ...params, moderation: input.moderation });
+		const result = await client.images.generate({ ...params, moderation: input.moderation ?? "low" });
 		return saveImages(result, input, params.model, params.size);
 	},
 );

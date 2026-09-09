@@ -64,7 +64,7 @@ Text to image. Required: `prompt`.
 
 | Option | Values | Default | Notes |
 |---|---|---|---|
-| `moderation` | `auto`, `low` | `auto` | Content moderation strictness. |
+| `moderation` | `auto`, `low` | `low` | Content moderation strictness. `low` is less restrictive. The API default is `auto`; this tool sends `low` unless set. |
 
 ### `edit_image`
 
