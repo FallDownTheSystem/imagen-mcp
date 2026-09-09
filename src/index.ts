@@ -97,7 +97,7 @@ server.registerTool(
 			"Generate one or more images from a text prompt with OpenAI GPT Image 2.5 (flare or sunburst). Saves files to disk and returns their paths.",
 		inputSchema: z.object({
 			...commonInput,
-			moderation: z.enum(["auto", "low"]).optional().describe("Content moderation strictness."),
+			moderation: z.enum(["auto", "low"]).optional().describe("Content moderation strictness. Default auto."),
 		}),
 		outputSchema,
 		annotations,
@@ -117,15 +117,19 @@ server.registerTool(
 			"Edit or combine one or more reference images (up to 16) using a text prompt with OpenAI GPT Image 2.5. An optional PNG mask with alpha marks the region to change. Saves files to disk and returns their paths.",
 		inputSchema: z.object({
 			...commonInput,
-			images: z.array(z.string()).min(1).max(16).describe("Paths to reference images (png, jpeg, webp)."),
+			images: z
+				.array(z.string())
+				.min(1)
+				.max(16)
+				.describe("Paths to 1-16 reference images (png, jpeg, webp). Relative paths resolve against the server working directory. Required."),
 			mask: z
 				.string()
 				.optional()
-				.describe("Path to a PNG mask with alpha; transparent areas are edited. Same dimensions as the first image."),
+				.describe("Path to a PNG mask with alpha; transparent areas are edited. Same dimensions as the first image. Default none (whole image editable)."),
 			input_fidelity: z
 				.enum(["high", "low"])
 				.optional()
-				.describe("high preserves faces, logos, and fine detail from the reference images."),
+				.describe("high preserves faces, logos, and fine detail from the reference images. Default low."),
 		}),
 		outputSchema,
 		annotations,
