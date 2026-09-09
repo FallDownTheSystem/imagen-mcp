@@ -54,7 +54,7 @@ export const commonInput = {
 	quality: z.enum(["low", "medium", "high", "xhigh", "max", "auto"]).optional().describe("Render quality. Default auto."),
 	background: z.enum(["transparent", "opaque", "auto"]).optional().describe("transparent requires png or webp."),
 	output_format: z.enum(["png", "jpeg", "webp"]).optional().describe("File format. Default png."),
-	output_compression: z.number().int().min(0).max(100).optional().describe("0-100, jpeg/webp only."),
+	output_compression: z.number().int().min(0).max(100).optional().describe("Quality level 0-100 for jpeg/webp, like JPEG quality. Lower = smaller file, more artifacts. Default 100."),
 	n: z.number().int().min(1).max(10).optional().describe("Number of images to produce. Default 1."),
 	output_dir: z.string().optional().describe("Directory to save images into. Default: IMAGEN_OUTPUT_DIR env or ./output."),
 	file_name: z.string().optional().describe("Base file name without extension. Default: timestamp plus prompt slug."),

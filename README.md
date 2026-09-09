@@ -76,7 +76,7 @@ Reference images to image. Required: `prompt`, `images` (1 to 16 file paths). Op
 | `quality` | `low`, `medium`, `high`, `xhigh`, `max`, `auto` | |
 | `background` | `transparent`, `opaque`, `auto` | Transparent needs `png` or `webp`. |
 | `output_format` | `png`, `jpeg`, `webp` | |
-| `output_compression` | 0 to 100 | `jpeg` and `webp` only. |
+| `output_compression` | 0 to 100 | `jpeg` and `webp` only. Works like JPEG quality: lower is smaller with more artifacts. Default 100. |
 | `n` | 1 to 10 | |
 | `moderation` | `auto`, `low` | `generate_image` only. |
 | `output_dir`, `file_name` | paths | Where to save. |
