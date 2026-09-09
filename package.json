@@ -1,0 +1,47 @@
+{
+	"name": "@falldownthesystem/imagen-mcp",
+	"version": "0.1.0",
+	"description": "Minimal MCP server for OpenAI GPT Image 2.5 (flare and sunburst): generate and edit images",
+	"type": "module",
+	"bin": {
+		"imagen-mcp": "dist/index.js"
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"dev": "tsc --watch",
+		"prepublishOnly": "npm run build"
+	},
+	"engines": {
+		"node": ">=22"
+	},
+	"keywords": [
+		"mcp",
+		"model-context-protocol",
+		"openai",
+		"gpt-image",
+		"image-generation"
+	],
+	"author": "FallDownTheSystem",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/FallDownTheSystem/imagen-mcp.git"
+	},
+	"homepage": "https://github.com/FallDownTheSystem/imagen-mcp#readme",
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/server": "^2.0.0",
+		"openai": "^7.13.0",
+		"zod": "^4.5.4"
+	},
+	"devDependencies": {
+		"@types/node": "^26.5.0",
+		"typescript": "^7.0.2"
+	}
+}
