@@ -74,7 +74,8 @@ Reference images to image. Required: `prompt`, `images`. The model regenerates t
 |---|---|---|---|
 | `images` | 1 to 16 file paths | required | `png`, `jpeg`, or `webp`. The first image is the main subject; extra images supply elements to combine, such as a logo or a style reference. Relative paths resolve against the server working directory. |
 | `mask` | file path | none | PNG with an alpha channel, same width and height as the first image. Fully transparent pixels mark the region the model may repaint; opaque pixels mark what to keep. Use for inpainting one area or filling an extended canvas. It is guidance, not a hard pixel lock. |
-| `input_fidelity` | `high`, `low` | `low` | How closely exact details from the references are preserved. `low` keeps content and layout, but faces, text, logos, and textures may shift. `high` keeps them faithful and steadies the area outside a mask. It costs more input tokens per reference image. Use `high` for real people, brands, product shots, or spot edits. |
+
+There is no `input_fidelity` option. The GPT Image 2.5 models always process reference images at high fidelity, and the API rejects the parameter. Faces, logos, text, and textures from the references are preserved by default.
 
 ### Shared options
 

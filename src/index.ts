@@ -15,7 +15,7 @@ try {
 }
 
 const client = new OpenAI();
-const server = new McpServer({ name: "imagen-mcp", version: "0.1.0" });
+const server = new McpServer({ name: "imagen-mcp", version: "0.1.1" });
 
 const MIME: Record<string, string> = { png: "image/png", jpeg: "image/jpeg", webp: "image/webp" };
 
@@ -117,7 +117,7 @@ server.registerTool(
 	{
 		title: "Edit image",
 		description:
-			"Edit, restyle, or combine 1-16 reference images with a text prompt using OpenAI GPT Image 2.5. The whole picture is regenerated; without a mask the prompt decides what changes. Saves files to disk and returns paths and token usage.",
+			"Edit, restyle, or combine 1-16 reference images with a text prompt using OpenAI GPT Image 2.5. The whole picture is regenerated; without a mask the prompt decides what changes. Reference details are always kept at high fidelity (no input_fidelity option). Saves files to disk and returns paths and token usage.",
 		inputSchema: z.object({
 			...commonInput,
 			images: z
@@ -129,10 +129,6 @@ server.registerTool(
 				.string()
 				.optional()
 				.describe("Path of a PNG with alpha, same size as first image. Transparent pixels = region to repaint (guidance, not a hard lock). Default none."),
-			input_fidelity: z
-				.enum(["high", "low"])
-				.optional()
-				.describe("high keeps faces, text, logos and unmasked areas faithful; costs more input tokens. Default low."),
 		}),
 		outputSchema,
 		annotations,
@@ -143,7 +139,6 @@ server.registerTool(
 			...params,
 			image: await Promise.all(input.images.map(loadImage)),
 			mask: input.mask ? await loadImage(input.mask) : undefined,
-			input_fidelity: input.input_fidelity,
 		});
 		return saveImages(result, input, params.model, params.size);
 	},
