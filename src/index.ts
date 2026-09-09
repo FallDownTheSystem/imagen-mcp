@@ -94,13 +94,13 @@ server.registerTool(
 	{
 		title: "Generate image",
 		description:
-			"Generate one or more images from a text prompt with OpenAI GPT Image 2.5 (flare or sunburst). Saves files to disk and returns their paths.",
+			"Generate images from a text prompt with OpenAI GPT Image 2.5. Saves files to disk and returns paths and token usage.",
 		inputSchema: z.object({
 			...commonInput,
 			moderation: z
 				.enum(["auto", "low"])
 				.optional()
-				.describe("Content moderation strictness. low = less restrictive filtering. Default low."),
+				.describe("OpenAI content filter. low refuses fewer borderline prompts. Default low."),
 		}),
 		outputSchema,
 		annotations,
@@ -117,22 +117,22 @@ server.registerTool(
 	{
 		title: "Edit image",
 		description:
-			"Edit or combine one or more reference images (up to 16) using a text prompt with OpenAI GPT Image 2.5. An optional PNG mask with alpha marks the region to change. Saves files to disk and returns their paths.",
+			"Edit, restyle, or combine 1-16 reference images with a text prompt using OpenAI GPT Image 2.5. The whole picture is regenerated; without a mask the prompt decides what changes. Saves files to disk and returns paths and token usage.",
 		inputSchema: z.object({
 			...commonInput,
 			images: z
 				.array(z.string())
 				.min(1)
 				.max(16)
-				.describe("Paths to 1-16 reference images (png, jpeg, webp). Relative paths resolve against the server working directory. Required."),
+				.describe("Paths of 1-16 reference images (png/jpeg/webp). First = main subject; others = elements to combine. Relative to server cwd."),
 			mask: z
 				.string()
 				.optional()
-				.describe("Path to a PNG mask with alpha; transparent areas are edited. Same dimensions as the first image. Default none (whole image editable)."),
+				.describe("Path of a PNG with alpha, same size as first image. Transparent pixels = region to repaint (guidance, not a hard lock). Default none."),
 			input_fidelity: z
 				.enum(["high", "low"])
 				.optional()
-				.describe("high preserves faces, logos, and fine detail from the reference images. Default low."),
+				.describe("high keeps faces, text, logos and unmasked areas faithful; costs more input tokens. Default low."),
 		}),
 		outputSchema,
 		annotations,

@@ -28,43 +28,60 @@ const MAX_RATIO = 3;
 const DEFAULT_LONG_EDGE = 1536;
 
 export const commonInput = {
-	prompt: z.string().min(1).max(32000).describe("Text description of the desired image."),
+	prompt: z
+		.string()
+		.min(1)
+		.max(32000)
+		.describe("Image description, or the change to make when editing."),
 	model: z
 		.enum(["flare", "sunburst"])
 		.optional()
-		.describe("flare = fast, general purpose. sunburst = slower, higher precision. Default flare (or IMAGEN_DEFAULT_MODEL env)."),
+		.describe("flare = fast, general purpose. sunburst = slower, higher precision. Same price. Default flare."),
 	size: z
 		.string()
 		.regex(/^(auto|\d+x\d+)$/)
 		.optional()
-		.describe(
-			"Exact output size: 'auto', '1024x1024', '1536x1024', '1024x1536', or custom WIDTHxHEIGHT (multiples of 16, ratio 1:3..3:1, long edge <= 3840). Overrides aspect_ratio. Default auto (model chooses).",
-		),
+		.describe("auto | 1024x1024 | 1536x1024 | 1024x1536 | WIDTHxHEIGHT (multiples of 16, ratio 1:3..3:1, max edge 3840). Overrides aspect_ratio. Default auto."),
 	aspect_ratio: z
 		.enum(Object.keys(ASPECT_RATIOS) as [AspectRatio, ...AspectRatio[]])
 		.optional()
-		.describe("Aspect ratio when size is not given. Combined with long_edge to compute WIDTHxHEIGHT. Default none (size auto)."),
+		.describe("Computes size together with long_edge. Default none."),
 	long_edge: z
 		.number()
 		.int()
 		.min(256)
 		.max(MAX_LONG_EDGE)
 		.optional()
-		.describe(`Pixel length of the longer side when aspect_ratio is used. Default ${DEFAULT_LONG_EDGE}, max ${MAX_LONG_EDGE}.`),
+		.describe(`Longer side in px, used with aspect_ratio. Default ${DEFAULT_LONG_EDGE}.`),
 	quality: z
 		.enum(["low", "medium", "high", "xhigh", "max", "auto"])
 		.optional()
-		.describe("Render quality; higher tiers cost more output tokens. Default auto (model chooses)."),
+		.describe("Higher = more detail, more output tokens. auto lets the model choose (may be costly). Default auto."),
 	background: z
 		.enum(["transparent", "opaque", "auto"])
 		.optional()
-		.describe("transparent requires png or webp. Default auto."),
-	output_format: z.enum(["png", "jpeg", "webp"]).optional().describe("File format. Default png."),
-	output_compression: z.number().int().min(0).max(100).optional().describe("Quality level 0-100 for jpeg/webp, like JPEG quality. Lower = smaller file, more artifacts. Default 100."),
-	n: z.number().int().min(1).max(10).optional().describe("Number of images to produce. Default 1."),
-	output_dir: z.string().optional().describe("Directory to save images into. Default: IMAGEN_OUTPUT_DIR env or ./output."),
-	file_name: z.string().optional().describe("Base file name without extension. Default: timestamp plus prompt slug."),
-	return_image: z.boolean().optional().describe("Also return the image bytes inline as MCP image content. Default false."),
+		.describe("transparent needs png or webp. Default auto."),
+	output_format: z.enum(["png", "jpeg", "webp"]).optional().describe("Also the file extension. Default png."),
+	output_compression: z
+		.number()
+		.int()
+		.min(0)
+		.max(100)
+		.optional()
+		.describe("jpeg/webp quality like JPEG: lower = smaller file, more artifacts. Default 100."),
+	n: z
+		.number()
+		.int()
+		.min(1)
+		.max(10)
+		.optional()
+		.describe("Number of variations to generate; each costs output tokens. Files get -1, -2 suffixes. Default 1."),
+	output_dir: z.string().optional().describe("Save directory. Default IMAGEN_OUTPUT_DIR env or ./output (relative to server cwd)."),
+	file_name: z.string().optional().describe("Base name without extension. Default timestamp + prompt slug."),
+	return_image: z
+		.boolean()
+		.optional()
+		.describe("Also return the image inline (base64, ~1.4 MB per 1024x1024 png) so it can be viewed. File is saved either way. Default false."),
 };
 
 export type CommonInput = z.infer<z.ZodObject<typeof commonInput>>;
