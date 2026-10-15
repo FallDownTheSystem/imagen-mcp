@@ -1,4 +1,5 @@
 import * as z from "zod/v4";
+import { outputInput } from "./output.js";
 
 export const MODELS = {
 	flare: "gpt-image-2.5-flare",
@@ -76,12 +77,7 @@ export const commonInput = {
 		.max(10)
 		.optional()
 		.describe("Number of variations to generate; each costs output tokens. Files get -1, -2 suffixes. Default 1."),
-	output_dir: z.string().optional().describe("Save directory. Default IMAGEN_OUTPUT_DIR env or ./output (relative to server cwd)."),
-	file_name: z.string().optional().describe("Base name without extension. Default timestamp + prompt slug."),
-	return_image: z
-		.boolean()
-		.optional()
-		.describe("Also return the image inline (base64, ~1.4 MB per 1024x1024 png) so it can be viewed. File is saved either way. Default false."),
+	...outputInput,
 };
 
 export type CommonInput = z.infer<z.ZodObject<typeof commonInput>>;

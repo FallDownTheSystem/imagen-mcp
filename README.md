@@ -1,11 +1,13 @@
 # imagen-mcp
 
-Minimal MCP server for OpenAI GPT Image 2.5. Two tools, two models.
+Minimal MCP server for OpenAI GPT Image 2.5 and Krea 3. Generate and edit tools for each provider.
 
-| Alias | API model | Use |
+| Provider | Tools | Models |
 |---|---|---|
-| `flare` (default) | `gpt-image-2.5-flare` | Fast, general purpose |
-| `sunburst` | `gpt-image-2.5-sunburst` | Slower, higher precision |
+| OpenAI | `generate_image`, `edit_image` | `flare` (default, `gpt-image-2.5-flare`): fast, general purpose. `sunburst` (`gpt-image-2.5-sunburst`): slower, higher precision. |
+| Krea | `krea_generate_image`, `krea_edit_image` | Krea 3: fast, instruction-following editor. Early-access beta. |
+
+The server registers a provider's tools only when that provider's API key is set.
 
 ## Setup
 
@@ -22,7 +24,10 @@ npm install
 npm run build
 ```
 
-Set `OPENAI_API_KEY` in the environment, or put it in a `.env` file next to `package.json`.
+Set one or both API keys in the environment, or put them in a `.env` file next to `package.json`:
+
+- `OPENAI_API_KEY`: enables the OpenAI tools.
+- `KREA_API_KEY`: enables the Krea tools. Create a token at [krea.ai/settings/api-tokens](https://www.krea.ai/settings/api-tokens). The Krea 3 API is in early access; only workspaces in the beta can call it. Request access at sales@krea.ai.
 
 Optional environment variables:
 
@@ -41,6 +46,7 @@ Claude Code (`.mcp.json`) or Claude Desktop, using the npm package:
 			"args": ["-y", "@falldownthesystem/imagen-mcp"],
 			"env": {
 				"OPENAI_API_KEY": "sk-...",
+				"KREA_API_KEY": "...",
 				"IMAGEN_OUTPUT_DIR": "C:/Users/me/Pictures/imagen"
 			}
 		}
@@ -53,10 +59,10 @@ Or with a local build, use `"command": "node"` and `"args": ["path/to/imagen-mcp
 Claude Code one-liner:
 
 ```sh
-claude mcp add imagen -e OPENAI_API_KEY=sk-... -- npx -y @falldownthesystem/imagen-mcp
+claude mcp add imagen -e OPENAI_API_KEY=sk-... -e KREA_API_KEY=... -- npx -y @falldownthesystem/imagen-mcp
 ```
 
-## Tools
+## OpenAI tools
 
 ### `generate_image`
 
@@ -98,3 +104,48 @@ Only the options you set are sent to the API. The default column shows what appl
 | `return_image` | boolean | `false` | Also return each image inline as MCP image content, so the client shows it and the model can inspect it. Adds about 1.4 MB of context per 1024x1024 png. The file is saved to disk either way. |
 
 The result lists the saved file paths, the model, the size, and token usage.
+
+## Krea tools
+
+Both tools call `POST /generate/image/krea/krea-3`, poll the job every 2 seconds, and download the result. A job that does not finish in 5 minutes, or a tool call that the client cancels, is cancelled on Krea. Failed and cancelled jobs are not billed.
+
+### `krea_generate_image`
+
+Text to image. Required: `prompt`.
+
+### `krea_edit_image`
+
+Reference images to image. Required: `prompt`, `images`. Write the prompt as an instruction: lead with the change, then add one sentence about what stays the same. With several references, name each one by what it shows, for example "Put the sneaker from the second image on the person in the first image."
+
+| Option | Values | Default | Notes |
+|---|---|---|---|
+| `images` | 1 to 8 local paths or `https` URLs | required | Local files (`png`, `jpeg`, `webp`) are uploaded to Krea assets for the request and deleted after it. URLs are passed through. References over 4 MP are resized to 4 MP. With 5 or more references, each is resized to 1536 px on its long side, so send 4 or fewer for full detail. |
+| `regional_edit` | boolean | `false` | `true` regenerates only the parts that must change and keeps the rest pixel-exact. Use it for local edits (recolor, add or remove an object, change text) and for chained edits on the latest output. Leave it off for global edits (restyle, relight, reframe, combine images into a new scene), which re-render the whole picture. |
+
+There is no mask option. Krea 3 decides the edit region from the prompt.
+
+### Shared Krea options
+
+Only the options you set are sent, except `thinking_mode` and `resolution`, which are always sent with their defaults.
+
+| Option | Values | Default | Notes |
+|---|---|---|---|
+| `prompt` | text | required | |
+| `thinking_mode` | `fast`, `high` | `fast` | How much Krea 3 plans before it generates. `high` uses a stronger reasoning engine for complex or multi-step edits and for combining several references. It is slower and costs $0.02 more. |
+| `resolution` | `1K`, `2K` | `2K` | Output canvas size. 2K is the native resolution. |
+| `aspect_ratio` | `1:1`, `4:5`, `3:4`, `2:3`, `9:16`, `5:4`, `4:3`, `3:2`, `16:9`, `21:9` | none | Omit for automatic framing. |
+| `negative_prompt` | text, up to 1024 chars | none | What to avoid. |
+| `seed` | integer | random | With `n` greater than 1, variation `i` uses `seed + i`. The same seed does not guarantee the same image, because the prompt expansion step varies between runs. |
+| `n` | 1 to 4 | 1 | Each variation is a separate job, billed separately. If some jobs fail, the finished images are still saved and the failures are listed in `errors`. |
+| `output_dir`, `file_name`, `return_image` | | | Same as the OpenAI tools. |
+
+Pricing per image:
+
+| Component | 1K output | 2K output |
+|---|---|---|
+| Base price | $0.03 | $0.06 |
+| Each 1K reference image | +$0.02 | +$0.02 |
+| Each 2K reference image | +$0.07 | +$0.07 |
+| `high` thinking mode | +$0.02 | +$0.02 |
+
+The result lists the saved file paths, the model, the resolution, the aspect ratio, the thinking mode, and the Krea job IDs.

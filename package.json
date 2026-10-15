@@ -1,7 +1,7 @@
 {
 	"name": "@falldownthesystem/imagen-mcp",
 	"version": "0.1.1",
-	"description": "Minimal MCP server for OpenAI GPT Image 2.5 (flare and sunburst): generate and edit images",
+	"description": "Minimal MCP server for OpenAI GPT Image 2.5 (flare and sunburst) and Krea 3: generate and edit images",
 	"type": "module",
 	"bin": {
 		"imagen-mcp": "dist/index.js"
@@ -23,6 +23,7 @@
 		"model-context-protocol",
 		"openai",
 		"gpt-image",
+		"krea",
 		"image-generation"
 	],
 	"author": "FallDownTheSystem",
@@ -36,12 +37,12 @@
 		"access": "public"
 	},
 	"dependencies": {
-		"@modelcontextprotocol/server": "^2.0.0",
-		"openai": "^7.13.0",
-		"zod": "^4.5.4"
+		"@modelcontextprotocol/server": "^2.3.1",
+		"openai": "^7.34.0",
+		"zod": "^4.6.7"
 	},
 	"devDependencies": {
-		"@types/node": "^26.5.0",
+		"@types/node": "^26.6.5",
 		"typescript": "^7.0.2"
 	}
 }
