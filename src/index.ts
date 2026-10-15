@@ -19,7 +19,7 @@ if (!openaiKey && !kreaKey) {
 	process.exit(1);
 }
 
-const server = new McpServer({ name: "imagen-mcp", version: "0.1.1" });
+const server = new McpServer({ name: "imagen-mcp", version: "0.2.0" });
 
 // Tools are registered per configured provider so clients never see a tool that can only fail.
 if (openaiKey) registerOpenAITools(server);

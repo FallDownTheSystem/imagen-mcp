@@ -1,6 +1,6 @@
 {
 	"name": "@falldownthesystem/imagen-mcp",
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"description": "Minimal MCP server for OpenAI GPT Image 2.5 (flare and sunburst) and Krea 3: generate and edit images",
 	"type": "module",
 	"bin": {
